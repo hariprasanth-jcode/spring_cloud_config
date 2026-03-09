@@ -1,0 +1,70 @@
+create web project
+
+add properties
+
+user-service microservices
+spring.cloud.gateway.mvc.routes[0].id=user-service
+spring.cloud.gateway.mvc.routes[0].uri=http://localhost:8001
+spring.cloud.gateway.mvc.routes[0].predicates[0]=Path=/user/**
+
+#spring.cloud.gateway.server.webmvc.routes[0].filters[0]=StripPrefix=1
+
+spring.cloud.gateway.mvc.routes[1].id=orderservice
+spring.cloud.gateway.mvc.routes[1].uri=http://localhost:8002
+spring.cloud.gateway.mvc.routes[1].predicates[0]=Path=/order/**
+
+spring.cloud.gateway.mvc.routes[2].id=paymentservice
+spring.cloud.gateway.mvc.routes[2].uri=http://localhost:8003
+spring.cloud.gateway.mvc.routes[2].predicates[0]=Path=/payment/**
+
+springdoc.swagger-ui.urls[0].name=user-service
+springdoc.swagger-ui.urls[0].url=http://localhost:8001/v3/api-docs
+
+
+for dynamic routing
+
+spring.cloud.gateway.discovery.locator.enabled=true
+
+spring.cloud.gateway.server.webflux.discovery.locator.enabled=true
+
+eureka.client.service-url.defaultZone=http://localhost:8761/registry/eureka
+
+spring.cloud.gateway.server.webflux.discovery.locator.lower-case-service-id=true
+
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+@EnableDiscoveryClient  ----> above server
+@EnableEurekaServer-------->above registry
+
+<properties>
+		<java.version>21</java.version>
+		<spring-cloud.version>2025.0.1</spring-cloud.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+Eureka server config in Registry
+
+spring.application.name=service_registery
+
+
+server.servlet.context-path=/registry
+
+eureka.client.fetch-registry=false
+
+eureka.client.register-with-eureka=false
+
+eureka.instance.hostname=localhost
+
+logging.level.org.springframework=DEBUG
+
+server.port=8761
