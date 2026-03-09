@@ -1,0 +1,169 @@
+@Data
+@Entity
+@Table(name="amazon_user_info")
+public class UserInformation {
+
+	@Id
+	private String emailId;
+	private String password;
+	private String fullName;
+}
+==========================================
+package cpm.user_service.user.service.service;
+
+import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import cpm.user_service.user.service.entity.UserInformation;
+import cpm.user_service.user.service.repo.UserJpaRepository;
+
+@Service
+public class UserService {
+	
+	@Autowired
+	UserJpaRepository jpa;
+	
+	public String create(UserInformation info) {
+		jpa.save(info);
+		return "Data Saved";
+	}
+
+	public UserInformation getUserById(String email) {
+		
+		return jpa.findById(email).orElseThrow(()->new RuntimeException("Email Id Not found"));
+		// TODO Auto-generated method stub
+		
+	}
+
+}
+=============================================================
+package com.payment_service.paymentservice.controller;
+
+import java.util.List;
+
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+@EnableDiscoveryClient
+@RestController
+//@CrossOrigin(origins = "http://localhost:8888")
+public class PaymentController {
+
+	
+	@GetMapping("/options")
+	public List<String> getAllPaymentOptions(){
+		
+		System.out.println("Request for Payment option");
+		return List.of("UPI","Net Banking","Credit Card","Debit Card");
+	}
+	
+	@GetMapping("/netbanking")
+	public String netBanking(@RequestBody NetBankingInfo info){
+		
+		System.out.println("Request for Net Banking Payment option");
+		return "Payment Success";
+	}
+}
+===============================================================
+package com.payment_service.paymentservice.controller;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class NetBankingInfo {
+
+	String userId;
+	String password;
+}
+=====================================================================
+package com.order_service.orderservice.controller;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.order_service.orderservice.entity.OrderInformation;
+import com.order_service.orderservice.entity.ProductDetials;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:8888")
+public class OrderController {
+
+	@PostMapping("/create")
+	public String createOrder(@RequestBody OrderInformation info) {
+		
+		System.out.println("Order Creation Request for Uer : "+info.getEmailId());
+		return "create order : "+UUID.randomUUID();
+	}
+	
+	@GetMapping("/info/{orderId}")
+	public OrderInformation createOrder(@PathVariable String orderId) {
+		
+		System.out.println("Order information for Order Id : "+orderId);
+		return new 
+				OrderInformation("hari.hp000@gmail.com",List
+						.of(new ProductDetials(1,"Iphone",80000),new ProductDetials(2,"Mac Book", 100000)), 180000 );
+	}
+}
+============================================================================================
+package com.order_service.orderservice.entity;
+
+import java.util.List;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderInformation {
+
+	private String emailId;
+	private List<ProductDetials> productInfo;
+	private double totalAmount;
+	
+	
+	
+}
+======================================================================================
+package com.order_service.orderservice.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name="amazon_order_info")
+public class ProductDetials {
+
+	
+	@Id
+	private Integer productId;
+	
+	private String productName;
+	
+	private double productPrice;
+	
+	
+}
